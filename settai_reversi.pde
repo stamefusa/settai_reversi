@@ -30,24 +30,13 @@ void setup()
   size(1280, 640, P3D);
   calcSize();
 
+  // 初期表示
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
       if (cells[j][i] == MY_STATUS) {
         stones.add(new Stone(i, j, MY_STATUS));
       } else if (cells[j][i] == ENEMY_STATUS) {
         stones.add(new Stone(i, j, ENEMY_STATUS));
-      }
-    }
-  }
-
-  ArrayList tmp = search(7, 4);  
-  for (int k = 0; k < tmp.size(); k++) {
-    printArray(tmp.get(k));
-    for (Stone s : stones) {
-      int[] tmp2 = (int[])tmp.get(k);
-      if (tmp2[0] == s.x && tmp2[1] == s.y) {
-        // デバッグ用
-        s.status = 2;
       }
     }
   }
@@ -176,4 +165,16 @@ void mouseReleased()
     deg = 0;
   }
   println("click. " + deg);
+  
+  ArrayList tmp = search(7, 4);  
+  for (int k = 0; k < tmp.size(); k++) {
+    printArray(tmp.get(k));
+    for (Stone s : stones) {
+      int[] tmp2 = (int[])tmp.get(k);
+      if (tmp2[0] == s.x && tmp2[1] == s.y) {
+        // デバッグ用
+        s.status = 2;
+      }
+    }
+  }
 }
