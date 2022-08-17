@@ -24,7 +24,7 @@ int count = 0;
 
 void setup()
 {
-  load(1);
+  load(2);
 
   minim = new Minim(this);
   se = minim.loadFile("se.wav");
@@ -64,6 +64,7 @@ void load(int num)
   int[] a = int(split(answer[0], ','));
   solve_x = a[0];
   solve_y = a[1];
+  println("x: " + solve_x + " y: " + solve_y);
 }
 
 void init()
@@ -87,7 +88,7 @@ void calcSize()
  c_height = (int)(height / 2 * 0.22); // 最後の係数でマス目のサイズを調整、0.2～0.25の間で指定。0.25で画面高さにぴったり。
  c_width = c_height;
  c_stroke = (int)(width * 0.004);
- s_diam = (int)(c_height * 0.8); // 石の大きさはマス目に対して80%とする。
+ s_diam = (int)(c_height * 0.85); // 石の大きさはマス目に対して85%とする。
  s_stroke = (int)(width * 0.002);
 
  println("c_stroke: " + c_stroke + " | s_stroke: " + s_stroke);
@@ -170,7 +171,7 @@ ArrayList search(int x, int y)
   // 方向ごとに探索
   for (int j = -1; j <= 1; j++) {
     for (int i = -1; i <= 1; i++) {
-      //println("i : " + i + " j : " + j);
+      println("i : " + i + " j : " + j);
       result.addAll(this.searchOneDirection(x, y, i, j));
     }
   }
@@ -187,8 +188,8 @@ ArrayList searchOneDirection(int x, int y, int x_direction, int y_direction)
   while (result_tmp == true) {
     int[] tmp = {next_x, next_y};
     result.add(tmp);
-    //print("searched.");
-    //printArray(tmp);
+    print("searched.");
+    printArray(tmp);
 
     next_x += x_direction;
     next_y += y_direction;
@@ -202,7 +203,7 @@ boolean enableStoneFlipped(int x, int y)
   if (x < 0 || x >= 8 || y < 0 || y >= 8) {
     return false;
   }
-  //println("x : " + x + " y : " + y);
+  println("x : " + x + " y : " + y);
 
   return (cells[y][x] == ENEMY_STATUS) ? true : false; // 指定する座標が敵の石であればひっくり返せるのでtrueを返す
 }
