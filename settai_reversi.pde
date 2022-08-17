@@ -11,19 +11,9 @@ int s_stroke = 4; // 石の線の太さ
 final int MY_STATUS = 1; // 自分の石を表すステータス
 final int ENEMY_STATUS = -1; // 相手の石を表すステータス
 
-int[][] cells = {
-  {0, 0, 0, 0, 1, 0, 0, 0},
-  {0, 0, 0, 0, -1, 0, 0, 0},
-  {0, 0, 0, -1, -1, 0, 1, 0},
-  {0, 0, 0, 1, -1, -1, 0, 0},
-  {0, 0, 1, -1, 0, -1, -1, 1},
-  {0, 0, 0, -1, -1, 0, 0, 0},
-  {0, 0, -1, 0, 1, 0, 0, 0},
-  {0, 1, 0, 0, 0, 0, 0, 0}
-};
-
-int solve_x = 4;
-int solve_y = 4;
+int[][] cells = new int[8][8]; // 盤面の石の状態を格納する配列
+int solve_x = 0; // 次に打つ石のx座標
+int solve_y = 0; // 次に打つ石のy座標
 
 ArrayList<Stone> stones = new ArrayList<Stone>();
 
@@ -33,12 +23,14 @@ int count = 0;
 
 void setup()
 {
+  load(1);
+
   minim = new Minim(this);
   se = minim.loadFile("se.wav");
   delay(500);
   se.play();
 
-  frameRate(30);
+  frameRate(10);
   //fullScreen(P3D);
   size(1024, 640, P3D);
   calcSize();
@@ -56,6 +48,21 @@ void draw()
   for (Stone s : stones) {
     dispStone(s);
   }
+}
+
+void load(int num)
+{
+  String[] problem = loadStrings("problems/" + num + ".csv");
+  for (int i = 0; i < problem.length; i++) {
+    int[] c = int(split(problem[i], ','));
+    for (int j = 0; j < c.length; j++) {
+      cells[i][j] = c[j];
+    }
+  }
+  String[] answer = loadStrings("answers/" + num + ".csv");
+  int[] a = int(split(answer[0], ','));
+  solve_x = a[0];
+  solve_y = a[1];
 }
 
 void init()
@@ -138,7 +145,7 @@ void animatedStones()
   }
 
   // 一定期間ごとに石をひっくり返す演出を入れる
-  if (count == 13) {
+  if (count == 4) {
     int[] tmp = (int[])targets.get(0);
     //printArray(tmp);
     for (Stone s : stones) {
@@ -212,6 +219,7 @@ void mouseReleased()
 void keyTyped()
 {
   if (key == 'a') {
+    load(1);
     init();
   }  
 }
