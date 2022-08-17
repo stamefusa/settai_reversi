@@ -11,7 +11,7 @@ int[][] cells = {
   {0, 0, 0, 0, -1, 0, 0, 0},
   {0, 0, 0, -1, -1, 0, 1, 0},
   {0, 0, 0, 1, -1, -1, 0, 0},
-  {0, 0, 1, -1, 1, -1, -1, 1},
+  {0, 0, 1, -1, 0, -1, -1, 1},
   {0, 0, 0, -1, -1, 0, 0, 0},
   {0, 0, -1, 0, 1, 0, 0, 0},
   {0, 1, 0, 0, 0, 0, 0, 0}
@@ -19,17 +19,34 @@ int[][] cells = {
 
 ArrayList<Stone> stones = new ArrayList<Stone>();
 
-int deg = 0;
-
-Stone s1, s2;
+boolean isFlipped = false;
+ArrayList targets;
+int count = 0;
 
 void setup()
 {
   frameRate(30);
   //fullScreen(P3D);
-  size(1280, 640, P3D);
+  size(1024, 640, P3D);
   calcSize();
+  init();  
+}
 
+void draw()
+{
+  if (isFlipped == true) {
+    animatedStones();
+  }
+
+  dispBoard();
+
+  for (Stone s : stones) {
+    dispStone(s);
+  }
+}
+
+void init()
+{
   // 初期表示
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
@@ -39,15 +56,6 @@ void setup()
         stones.add(new Stone(i, j, ENEMY_STATUS));
       }
     }
-  }
-}
-
-void draw()
-{
-  dispBoard();
-
-  for (Stone s : stones) {
-    dispStone(s);
   }
 }
 
@@ -89,7 +97,6 @@ void dispStone(Stone s)
   // マス目の始点（左上）から石の位置*マス目の高さの分だけ下に動かして描画する
   int draw_y = (int)(height / 2) + (c_height * -4) + s.y * c_height + (int)(c_height / 2);
 
-  //int draw_z = (deg > 0) ? s_diam : 0;
   int draw_z = 0;
 
   //color stone_color = (s.status == MY_STATUS) ? color(0) : color(255);
@@ -108,10 +115,35 @@ void dispStone(Stone s)
   
   pushMatrix();
   translate(draw_x, draw_y, draw_z);
-  //rotateX(radians(deg));
   ellipse(0, 0, s_diam, s_diam);
   popMatrix();
 
+}
+
+void animatedStones()
+{
+  // 石をひっくり返すときの演出
+
+  // ひっくり返す石がなくなったらスキップ
+  if (targets.isEmpty() == true) {
+    isFlipped = false;
+    count = 0;
+    return;
+  }
+
+  // 一定期間ごとに石をひっくり返す演出を入れる
+  if (count == 10) {
+    int[] tmp = (int[])targets.get(0);
+    printArray(tmp);
+    for (Stone s : stones) {
+      if (tmp[0] == s.x && tmp[1] == s.y) {
+        s.status = 1;
+      }
+    }
+    targets.remove(0);
+    count = 0;
+  }
+  count++;
 }
 
 ArrayList search(int x, int y)
@@ -159,22 +191,8 @@ boolean enableStoneFlipped(int x, int y)
 
 void mouseReleased()
 {
-  if (deg < 180) {
-    deg += 10;
-  } else {
-    deg = 0;
-  }
-  println("click. " + deg);
-  
-  ArrayList tmp = search(7, 4);  
-  for (int k = 0; k < tmp.size(); k++) {
-    printArray(tmp.get(k));
-    for (Stone s : stones) {
-      int[] tmp2 = (int[])tmp.get(k);
-      if (tmp2[0] == s.x && tmp2[1] == s.y) {
-        // デバッグ用
-        s.status = 2;
-      }
-    }
-  }
+  stones.add(new Stone(4, 4, MY_STATUS));
+  targets = search(4, 4);
+
+  isFlipped = true;
 }
