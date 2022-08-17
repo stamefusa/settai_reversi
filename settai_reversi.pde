@@ -1,3 +1,8 @@
+import ddf.minim.*;
+
+Minim minim;
+AudioPlayer se;
+
 int c_width = 0, c_height = 0; // セルの幅と高さ
 int c_stroke = 10; // セルの線の太さ
 int s_diam = 0; // 石の直径
@@ -17,6 +22,9 @@ int[][] cells = {
   {0, 1, 0, 0, 0, 0, 0, 0}
 };
 
+int solve_x = 4;
+int solve_y = 4;
+
 ArrayList<Stone> stones = new ArrayList<Stone>();
 
 boolean isFlipped = false;
@@ -25,6 +33,11 @@ int count = 0;
 
 void setup()
 {
+  minim = new Minim(this);
+  se = minim.loadFile("se.wav");
+  delay(500);
+  se.play();
+
   frameRate(30);
   //fullScreen(P3D);
   size(1024, 640, P3D);
@@ -48,6 +61,7 @@ void draw()
 void init()
 {
   // 初期表示
+  stones.clear();
   for (int i = 0; i < 8; i++) {
     for (int j = 0; j < 8; j++) {
       if (cells[j][i] == MY_STATUS) {
@@ -57,6 +71,7 @@ void init()
       }
     }
   }
+  isFlipped = false;
 }
 
 void calcSize()
@@ -99,16 +114,7 @@ void dispStone(Stone s)
 
   int draw_z = 0;
 
-  //color stone_color = (s.status == MY_STATUS) ? color(0) : color(255);
-  // 以下はデバッグ用、実際には上の1行だけでよい
-  color stone_color = color(255);
-  if (s.status == MY_STATUS) {
-    stone_color = color(0);
-  } else if (s.status == ENEMY_STATUS) {
-    stone_color = color(255);
-  } else if (s.status == 2) {
-    stone_color = color(100);
-  }
+  color stone_color = (s.status == MY_STATUS) ? color(255) : color(0);
   fill(stone_color);
   strokeWeight(s_stroke);
   stroke(0);
@@ -132,18 +138,22 @@ void animatedStones()
   }
 
   // 一定期間ごとに石をひっくり返す演出を入れる
-  if (count == 10) {
+  if (count == 13) {
     int[] tmp = (int[])targets.get(0);
-    printArray(tmp);
+    //printArray(tmp);
     for (Stone s : stones) {
       if (tmp[0] == s.x && tmp[1] == s.y) {
         s.status = 1;
+        break;
       }
     }
+    se.play(0);
+
     targets.remove(0);
     count = 0;
+  } else {
+    count++;
   }
-  count++;
 }
 
 ArrayList search(int x, int y)
@@ -152,7 +162,7 @@ ArrayList search(int x, int y)
   // 方向ごとに探索
   for (int j = -1; j <= 1; j++) {
     for (int i = -1; i <= 1; i++) {
-      println("i : " + i + " j : " + j);
+      //println("i : " + i + " j : " + j);
       result.addAll(this.searchOneDirection(x, y, i, j));
     }
   }
@@ -169,8 +179,8 @@ ArrayList searchOneDirection(int x, int y, int x_direction, int y_direction)
   while (result_tmp == true) {
     int[] tmp = {next_x, next_y};
     result.add(tmp);
-    print("searched.");
-    printArray(tmp);
+    //print("searched.");
+    //printArray(tmp);
 
     next_x += x_direction;
     next_y += y_direction;
@@ -184,15 +194,24 @@ boolean enableStoneFlipped(int x, int y)
   if (x < 0 || x >= 8 || y < 0 || y >= 8) {
     return false;
   }
-  println("x : " + x + " y : " + y);
+  //println("x : " + x + " y : " + y);
 
   return (cells[y][x] == ENEMY_STATUS) ? true : false; // 指定する座標が敵の石であればひっくり返せるのでtrueを返す
 }
 
 void mouseReleased()
 {
-  stones.add(new Stone(4, 4, MY_STATUS));
-  targets = search(4, 4);
+  se.play(0);
+
+  stones.add(new Stone(solve_x, solve_y, MY_STATUS));
+  targets = search(solve_x, solve_y);
 
   isFlipped = true;
+}
+
+void keyTyped()
+{
+  if (key == 'a') {
+    init();
+  }  
 }
