@@ -15,8 +15,9 @@ int[][] cells = new int[8][8]; // 盤面の石の状態を格納する配列
 int solve_x = 0; // 次に打つ石のx座標
 int solve_y = 0; // 次に打つ石のy座標
 
-ArrayList<Stone> stones = new ArrayList<Stone>();
+ArrayList<Stone> stones = new ArrayList<Stone>(); // 石を格納するArrayList
 
+// 石をひっくり返すときのアニメーション制御用変数
 boolean isFlipped = false;
 ArrayList targets;
 int count = 0;
