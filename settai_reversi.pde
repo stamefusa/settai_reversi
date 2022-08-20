@@ -11,6 +11,8 @@ int s_stroke = 4; // 石の線の太さ
 final int MY_STATUS = 1; // 自分の石を表すステータス
 final int ENEMY_STATUS = -1; // 相手の石を表すステータス
 
+final int MAX_BOARD_NUM = 2; // 盤面バリエーションの最大数
+
 int[][] cells = new int[8][8]; // 盤面の石の状態を格納する配列
 int solve_x = 0; // 次に打つ石のx座標
 int solve_y = 0; // 次に打つ石のy座標
@@ -22,9 +24,14 @@ boolean isFlipped = false;
 ArrayList targets;
 int count = 0;
 
+// 次の盤面に遷移するときの制御用変数
+boolean isFinished = false;
+int finished_time = 0;
+int current_board = 1;
+
 void setup()
 {
-  load(2);
+  load(current_board);
 
   minim = new Minim(this);
   se = minim.loadFile("se.wav");
@@ -44,6 +51,16 @@ void draw()
     animatedStones();
   }
 
+  if (isFinished == true) {
+    // 3秒経ったら次の盤面へ
+    if (millis() - finished_time > 3000) {
+      isFinished = false;
+      current_board = (current_board == MAX_BOARD_NUM) ? 1 : current_board + 1; // インクリメント、最大に達したら1から
+      load(current_board);
+      init();
+    }
+  }
+
   dispBoard();
 
   for (Stone s : stones) {
@@ -53,6 +70,8 @@ void draw()
 
 void load(int num)
 {
+  println("load number: " + num);
+
   String[] problem = loadStrings("problems/" + num + ".csv");
   for (int i = 0; i < problem.length; i++) {
     int[] c = int(split(problem[i], ','));
@@ -64,7 +83,7 @@ void load(int num)
   int[] a = int(split(answer[0], ','));
   solve_x = a[0];
   solve_y = a[1];
-  println("x: " + solve_x + " y: " + solve_y);
+  //println("x: " + solve_x + " y: " + solve_y);
 }
 
 void init()
@@ -142,6 +161,8 @@ void animatedStones()
   // ひっくり返す石がなくなったらスキップ
   if (targets.isEmpty() == true) {
     isFlipped = false;
+    isFinished = true;
+    finished_time = millis();
     count = 0;
     return;
   }
