@@ -11,7 +11,7 @@ int s_stroke = 4; // 石の線の太さ
 final int MY_STATUS = 1; // 自分の石を表すステータス
 final int ENEMY_STATUS = -1; // 相手の石を表すステータス
 
-final int MAX_BOARD_NUM = 2; // 盤面バリエーションの最大数
+final int MAX_BOARD_NUM = 10; // 盤面バリエーションの最大数
 
 int[][] cells = new int[8][8]; // 盤面の石の状態を格納する配列
 int solve_x = 0; // 次に打つ石のx座標
@@ -39,8 +39,8 @@ void setup()
   se.play();
 
   frameRate(10);
-  //fullScreen(P3D);
-  size(1024, 640, P3D);
+  fullScreen(P3D);
+  //size(1024, 640, P3D);
   calcSize();
   init();  
 }
